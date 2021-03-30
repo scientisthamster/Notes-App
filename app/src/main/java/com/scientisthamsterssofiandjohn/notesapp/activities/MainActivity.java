@@ -2,12 +2,19 @@ package com.scientisthamsterssofiandjohn.notesapp.activities;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 
 import com.scientisthamsterssofiandjohn.notesapp.R;
+import com.scientisthamsterssofiandjohn.notesapp.database.NotesDatabase;
+import com.scientisthamsterssofiandjohn.notesapp.entities.Note;
+
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -19,6 +26,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         init();
+        getNotes();
     }
 
     private void init() {
@@ -30,5 +38,27 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
+    }
+
+    private void getNotes(){
+
+        @SuppressLint("StaticFieldLeak")
+        class GetNotesTask extends AsyncTask<Void, Void, List<Note>>{
+
+            @Override
+            protected List<Note> doInBackground(Void... voids) {
+                return NotesDatabase.getDatabase(getApplicationContext())
+                        .noteDao().getAllNotes();
+            }
+
+            @Override
+            protected void onPostExecute(List<Note> notes) {
+                super.onPostExecute(notes);
+                Log.d("MY_NOTES",notes.toString());
+            }
+        }
+
+        new GetNotesTask().execute();
+
     }
 }
